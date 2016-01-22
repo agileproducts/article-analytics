@@ -1,6 +1,7 @@
 #! /usr/bin/env ruby
 
 require 'csv'
+require 'time'
 
 if ARGV[0].nil?
   abort "please supply an input file"
@@ -20,19 +21,45 @@ def histogram(hash)
   end
 end
 
+def mean(hash, field)
+  i = 0
+  sum = hash.inject(0) do |result,element|
+    field_value = element.flatten[1][field.to_sym]
+    result += field_value
+    i +=1
+    result
+  end
+  (sum/i).round(1)
+end
+
+
+
+
 
 @data = {}
 
 CSV.foreach(ARGV[0], :col_sep => "|") do |line|
   unless @data.has_key? line[0]
-    @data.merge!({"#{line[0]}" => {:time_start => line[1], :depth => line[4].to_i }})
+    @data.merge!({"#{line[0]}" => {:time_start => Time.parse(line[1]), :duration=>0.0, :depth => line[4].to_i }})
   else
-    @data["#{line[0]}"].merge!({:time_end => line[1], :depth => line[4].to_i})
+    start_time = @data["#{line[0]}"][:time_start]
+    @data["#{line[0]}"].merge!({:duration => Time.parse(line[1]) - start_time, :depth => line[4].to_i})
   end
 end
 
 
-
+p @data
 hist = histogram(@data).sort.map {|a| a[1]}
 puts hist
+
+average_time = mean(@data, "duration")
+puts average_time
+
+
+#histogram of depth
+#mean depth
+#binned histogram of time
+#median time
+
+
 
