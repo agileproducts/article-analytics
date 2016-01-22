@@ -79,7 +79,7 @@ end
       initial_value = event.value
       event.increment_time
       event.increment_value
-      event.action = "continue"
+      event.action = "scroll"
       unless initial_value == 100 then @event_buffer.add(event) end
       puts "#{event.uid}|#{event.time}|#{event.category}|#{event.action}|#{event.value}"
     else
